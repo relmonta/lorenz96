@@ -5,7 +5,7 @@ from tqdm import trange
 import cmocean
 import os
 
-PATH = "outputs/"
+PATH = "lorenz96/outputs"
 
 
 class Lorenz96:
