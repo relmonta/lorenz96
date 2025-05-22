@@ -52,9 +52,9 @@ class Lorenz96Surrogate(nn.Module):
         """
         Load the model state from a file.
         """
-        model_path = f'{PATH}/{self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'
+        model_path = f'{PATH}/{self.model_type}/best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'
         # Previously stored model weights
-        model_path_stored = f'{PATH}/stored/{self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'
+        model_path_stored = f'{PATH}/stored/{self.model_type}/best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'
         if os.path.exists(model_path):
             self.model.load_state_dict(
                 torch.load(model_path, weights_only=True))

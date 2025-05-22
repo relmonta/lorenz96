@@ -71,9 +71,9 @@ class Trainer:
                 best_val_loss = val_loss
                 patience_counter = 0
                 torch.save(self.model.state_dict(), os.path.join(PATH,
-                           f'{self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
+                           f'{self.model_type}/best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
                 # print(
-                #     f"Best model saved as {self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
+                #     f"Best model saved as {self.model_type}/best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
             else:
                 patience_counter += 1
                 if patience_counter >= self.patience:
@@ -82,9 +82,9 @@ class Trainer:
 
         self._plot_losses(losses)
         print(
-            f"Final model saved as {self.model_type}_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
+            f"Final model saved as {self.model_type}/dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
         torch.save(self.model.state_dict(), os.path.join(PATH,
-                   f'{self.model_type}_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
+                   f'{self.model_type}/dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
 
     def _plot_losses(self, losses):
         plt.figure(figsize=(10, 5))
@@ -95,7 +95,7 @@ class Trainer:
         plt.title('Training and Validation Loss')
         plt.legend()
         plt.grid(True)
-        plt.savefig(f'{PATH}/{self.model_type}_training_loss.png', dpi=300)
+        plt.savefig(f'{PATH}/{self.model_type}/training_loss.png', dpi=300)
         plt.show()
 
 
@@ -148,7 +148,7 @@ class Inference:
         plt.title(f'{title} Lorenz-96 trajectory')
         plt.tight_layout()
         plt.savefig(
-            f'{PATH}/{title.replace(" ", "_").lower()}_traj.png', dpi=300)
+            f'{PATH}/{self.model_type}/{title.replace(" ", "_").lower()}_traj.png', dpi=300)
         plt.show()
 
 
@@ -211,7 +211,7 @@ if __name__ == "__main__":
 
         # Load the model
         model.load_state_dict(torch.load(
-            f'{PATH}/{model_type}_best_dt{dt}_Nx{Nx}_F{F}_network.pth', weights_only=True))
+            f'{PATH}/{model_type}/best_dt{dt}_Nx{Nx}_F{F}_network.pth', weights_only=True))
         print("Model loaded for inference.")
 
         # Perform inference
