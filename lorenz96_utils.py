@@ -4,22 +4,26 @@ import torch
 from tqdm import trange
 import cmocean
 import os
+import sys
 
-PATH = "lorenz96/outputs"
+if 'google.colab' in sys.modules:
+    PATH = "lorenz96/outputs"
+else:
+    PATH = "./outputs"
 
 
 class Lorenz96:
     def __init__(self, Nx=40, dt=0.01, F=8.0, integrator="rk4"):
         self.Nx = Nx
         self.dt = dt
-        self.F_val = F
+        self.F = F
         self.integrator = integrator
 
     def dxdt(self, x):
         dx = np.zeros_like(x)
         for i in range(self.Nx):
             dx[i] = (x[(i + 1) % self.Nx] - x[(i - 2) % self.Nx]) * \
-                x[(i - 1) % self.Nx] - x[i] + self.F_val
+                x[(i - 1) % self.Nx] - x[i] + self.F
         return dx
 
     def forward(self, x, steps=1):
@@ -43,7 +47,7 @@ class Lorenz96:
         return x
 
     def generate_dataset(self, Nt_train=10000, Nt_spinup=100, Nt_shift=1, seed=42):
-        path = f"{PATH}/lorenz96_dataset_Nt{Nt_train}_Nx{self.Nx}_F{self.F_val}.npz"
+        path = f"{PATH}/lorenz96_dataset_Nt{Nt_train}_dt{self.dt}_Nx{self.Nx}_F{self.F}.npz"
         # Load the dataset
         if os.path.exists(f"{path}"):
             data = np.load(

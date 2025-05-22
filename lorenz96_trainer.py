@@ -12,7 +12,10 @@ from lorenz96_utils import PATH
 
 class Trainer:
     def __init__(self, model, train_loader, val_loader, mean, std, device='cuda',
-                 model_type='hybrid', patience=15):
+                 model_type='hybrid', patience=15, dt=0.01, F=8.0):
+        self.dt = dt
+        self.F = F
+        self.Nx = model.Nx
         self.model_type = model_type
         self.model = model
         self.train_loader = train_loader
@@ -67,10 +70,10 @@ class Trainer:
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 patience_counter = 0
-                torch.save(self.model.state_dict(), PATH +
-                           f'{self.model_type}_best_network.pth')
+                torch.save(self.model.state_dict(), os.path.join(PATH,
+                           f'{self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
                 # print(
-                #     f"Best model saved as {PATH}{self.model_type}_best_network.pth")
+                #     f"Best model saved as {self.model_type}_best_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
             else:
                 patience_counter += 1
                 if patience_counter >= self.patience:
@@ -78,9 +81,10 @@ class Trainer:
                     break
 
         self._plot_losses(losses)
-        print(f"Final model saved as {PATH}{self.model_type}_network.pth")
-        torch.save(self.model.state_dict(), PATH +
-                   f'{self.model_type}_network.pth')
+        print(
+            f"Final model saved as {self.model_type}_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth")
+        torch.save(self.model.state_dict(), os.path.join(PATH,
+                   f'{self.model_type}_dt{self.dt}_Nx{self.Nx}_F{self.F}_network.pth'))
 
     def _plot_losses(self, losses):
         plt.figure(figsize=(10, 5))
@@ -164,7 +168,10 @@ if __name__ == "__main__":
     torch.set_default_dtype(torch.float64)
     # models_list = ['naive', 'conv', 'hybrid']
     models_list = ['hybrid']
-    true_model = Lorenz96(Nx=40, dt=0.01, F=8.0, integrator='rk4')
+    Nx = 40
+    dt = 0.01
+    F = 8.0
+    true_model = Lorenz96(Nx=Nx, dt=dt, F=F, integrator='rk4')
     xt = true_model.generate_dataset(
         Nt_train=args.Nt_train, Nt_spinup=1000, seed=42, Nt_shift=10)
     # change xt to double precision
@@ -199,12 +206,12 @@ if __name__ == "__main__":
             # Train the model
             trainer = Trainer(model, train_loader, val_loader, mean, std,
                               device='cuda' if torch.cuda.is_available() else 'cpu',
-                              model_type=model_type)
+                              model_type=model_type, dt=dt, F=F)
             trainer.train(epochs=args.epochs, lr=1e-3)
 
         # Load the model
         model.load_state_dict(torch.load(
-            f'{PATH}/{model_type}_best_network.pth', weights_only=True))
+            f'{PATH}/{model_type}_best_dt{dt}_Nx{Nx}_F{F}_network.pth', weights_only=True))
         print("Model loaded for inference.")
 
         # Perform inference
